@@ -1,0 +1,40 @@
+<!-- console.html or forge.html-->
+ {% extends "shell.html" %}
+{% block title %}Settings — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="forge-panel">
+  <header class="panel-head">
+    <h1>Settings</h1>
+    <p class="panel-sub">Read-only view of runtime configuration</p>
+  </header>
+  <section class="cards" id="forge-cards" data-testid="forge-cards"></section>
+  <section class="panel-sub">
+    <h2>Webhook targets</h2>
+    <table class="grid">
+      <thead>
+        <tr><th>Name</th><th>URL</th><th>Events</th><th></th></tr>
+      </thead>
+      <tbody id="forge-webhooks" data-testid="forge-webhooks"></tbody>
+    </table>
+    <button type="button" id="forge-add-webhook" class="btn-primary" data-testid="forge-add-webhook">Add webhook</button>
+  </section>
+</section>
+
+<dialog id="webhook-dialog" data-testid="webhook-dialog">
+  <form method="dialog" class="form">
+    <h2>Webhook</h2>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <input type="hidden" name="id" />
+    <label class="field"><span>Name</span><input name="name" required data-testid="webhook-name" /></label>
+    <label class="field"><span>URL</span><input name="url" type="url" required data-testid="webhook-url" /></label>
+    <label class="field"><span>Events (comma separated)</span><input name="events" required data-testid="webhook-events" /></label>
+    <menu>
+      <button value="cancel" data-testid="webhook-cancel">Cancel</button>
+      <button value="submit" class="btn-primary" data-testid="webhook-submit">Save</button>
+    </menu>
+  </form>
+</dialog>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.forge && window.Watchtower.forge.mount();</script>
+{% endblock %}

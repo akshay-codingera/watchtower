@@ -1,0 +1,25 @@
+{% extends "shell.html" %}
+{% block title %}Sign in — Watchtower{% endblock %}
+{% block content %}
+<section class="gate" data-testid="gate-panel">
+  <div class="gate-card">
+    <h1 class="gate-title">WATCHTOWER</h1>
+    <p class="gate-subtitle">Authenticate to continue</p>
+    {% if error %}
+      <p class="alert alert-error" role="alert" data-testid="gate-error">{{ error }}</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('views.gate_submit') }}" class="form" autocomplete="off">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+      <label class="field">
+        <span>Username</span>
+        <input name="username" type="text" required autofocus data-testid="gate-username" />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input name="password" type="password" required data-testid="gate-password" />
+      </label>
+      <button type="submit" class="btn-primary" data-testid="gate-submit">Sign in</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

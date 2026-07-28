@@ -1,0 +1,62 @@
+{% extends "shell.html" %}
+{% block title %}Registry — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="registry-panel">
+  <header class="panel-head">
+    <h1>Device Registry</h1>
+    <button type="button" class="btn-primary" id="registry-add" data-testid="registry-add">Register device</button>
+  </header>
+  <div class="filters">
+    <label class="field">
+      <span>Type</span>
+      <select id="registry-type" data-testid="registry-type">
+        <option value="">Any</option>
+        <option value="router">Router</option>
+        <option value="switch">Switch</option>
+        <option value="firewall">Firewall</option>
+        <option value="server">Server</option>
+        <option value="endpoint">Endpoint</option>
+      </select>
+    </label>
+    <label class="field grow">
+      <span>Search</span>
+      <input id="registry-q" type="search" placeholder="hostname or IP" data-testid="registry-q" />
+    </label>
+  </div>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>IP</th><th>Hostname</th><th>MAC</th><th>Type</th><th>Status</th><th>Last seen</th><th></th>
+      </tr>
+    </thead>
+    <tbody id="registry-body" data-testid="registry-body"></tbody>
+  </table>
+</section>
+
+<dialog id="registry-dialog" data-testid="registry-dialog">
+  <form method="dialog" class="form">
+    <h2>Register device</h2>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <label class="field"><span>IP address</span><input name="ip" required data-testid="registry-form-ip" /></label>
+    <label class="field"><span>Hostname</span><input name="hostname" data-testid="registry-form-hostname" /></label>
+    <label class="field">
+      <span>Classification</span>
+      <select name="classification" data-testid="registry-form-classification">
+        <option value="">Auto</option>
+        <option value="router">Router</option>
+        <option value="switch">Switch</option>
+        <option value="firewall">Firewall</option>
+        <option value="server">Server</option>
+        <option value="endpoint">Endpoint</option>
+      </select>
+    </label>
+    <menu>
+      <button value="cancel" data-testid="registry-form-cancel">Cancel</button>
+      <button value="submit" class="btn-primary" data-testid="registry-form-submit">Register</button>
+    </menu>
+  </form>
+</dialog>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.registry && window.Watchtower.registry.mount();</script>
+{% endblock %}

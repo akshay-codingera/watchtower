@@ -1,0 +1,46 @@
+{% extends "shell.html" %}
+{% block title %}Live Feed — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="livefeed-panel">
+  <header class="panel-head">
+    <h1>Live Feed</h1>
+    <div class="panel-actions">
+      <label class="filter">
+        <span>Severity</span>
+        <select id="livefeed-severity" data-testid="livefeed-severity">
+          <option value="">Any</option>
+          <option value="emergency">Emergency</option>
+          <option value="alert">Alert</option>
+          <option value="critical">Critical</option>
+          <option value="error">Error</option>
+          <option value="warning">Warning</option>
+          <option value="notice">Notice</option>
+          <option value="info">Info</option>
+          <option value="debug">Debug</option>
+        </select>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="livefeed-pause" data-testid="livefeed-pause" />
+        <span>Pause</span>
+      </label>
+    </div>
+  </header>
+  <div class="live-table" role="region" aria-live="polite">
+    <table class="grid">
+      <thead>
+        <tr>
+          <th scope="col">Time</th>
+          <th scope="col">Source</th>
+          <th scope="col">Host</th>
+          <th scope="col">Severity</th>
+          <th scope="col">Message</th>
+        </tr>
+      </thead>
+      <tbody id="livefeed-body" data-testid="livefeed-body"></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.livefeed && window.Watchtower.livefeed.mount();</script>
+{% endblock %}

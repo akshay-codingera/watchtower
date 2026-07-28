@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <title>{% block title %}Watchtower{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='rig.css') }}" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body data-page="{{ page_id|default('') }}">
+    {% if error %}
+      <main class="page-error" role="main">
+        <section class="error-card" data-testid="error-card">
+          <h1>Error {{ error.status }}</h1>
+          <p>{{ error.message }}</p>
+          <a href="{{ url_for('views.index') }}" data-testid="error-home-link">Return to Watchtower</a>
+        </section>
+      </main>
+    {% else %}
+      {% if page_id != 'gate' %}
+      <header class="topbar" role="banner">
+        <a class="brand" href="{{ url_for('views.index') }}" data-testid="brand-link">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-text">WATCHTOWER</span>
+        </a>
+        <nav class="mainnav" aria-label="Primary">
+          <a href="{{ url_for('views.observatory') }}" data-testid="nav-observatory">Observatory</a>
+          <a href="{{ url_for('views.livefeed') }}" data-testid="nav-livefeed">Live Feed</a>
+          <a href="{{ url_for('views.chronicle') }}" data-testid="nav-chronicle">Chronicle</a>
+          <a href="{{ url_for('views.registry') }}" data-testid="nav-registry">Registry</a>
+          <a href="{{ url_for('views.watchdog') }}" data-testid="nav-watchdog">Watchdog</a>
+          <a href="{{ url_for('views.topology') }}" data-testid="nav-topology">Topology</a>
+          <a href="{{ url_for('views.manifest') }}" data-testid="nav-manifest">Manifest</a>
+          <a href="{{ url_for('views.audit') }}" data-testid="nav-audit">Audit</a>
+          <a href="{{ url_for('views.health') }}" data-testid="nav-health">Health</a>
+          <a href="{{ url_for('views.forge') }}" data-testid="nav-forge">Settings</a>
+        </nav>
+        <div class="topbar-actions">
+          <span class="live-pulse" id="live-pulse" data-testid="live-pulse" aria-live="polite"></span>
+          <form method="post" action="{{ url_for('views.logout') }}" class="logout-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <button type="submit" class="btn-ghost" data-testid="logout-button">Sign out</button>
+          </form>
+        </div>
+      </header>
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        {% block breadcrumbs %}
+          <a href="{{ url_for('views.index') }}">Watchtower</a>
+          <span aria-hidden="true">/</span>
+          <span>{{ page_id|default('') }}</span>
+        {% endblock %}
+      </nav>
+      {% endif %}
+      <main class="page" id="page" role="main">
+        {% block content %}{% endblock %}
+      </main>
+      <footer class="footer" role="contentinfo">
+        <span>Watchtower SIEM</span>
+        <a href="{{ url_for('views.codex') }}" data-testid="footer-codex">Codex</a>
+      </footer>
+    {% endif %}
+    <script src="{{ url_for('static', filename='atlas.js') }}"></script>
+    <script src="{{ url_for('static', filename='pulse.js') }}"></script>
+    <script src="{{ url_for('static', filename='scope.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

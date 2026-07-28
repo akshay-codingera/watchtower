@@ -1,0 +1,30 @@
+{% extends "shell.html" %}
+{% block title %}Codex — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="codex-panel">
+  <header class="panel-head">
+    <h1>Codex</h1>
+    <p class="panel-sub">API reference for the Watchtower portal</p>
+  </header>
+  {% if spec %}
+    <p class="muted">Version {{ spec.info.version }} — {{ spec.info.description }}</p>
+    <table class="grid">
+      <thead>
+        <tr><th>Path</th><th>Methods</th><th>Summary</th></tr>
+      </thead>
+      <tbody>
+        {% for path, methods in spec.paths.items() %}
+          <tr>
+            <td><code>{{ path }}</code></td>
+            <td>{{ methods.keys()|list|join(', ')|upper }}</td>
+            <td>{% for m, meta in methods.items() %}{{ meta.summary }}{% if not loop.last %}; {% endif %}{% endfor %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p><a href="{{ url_for('api_swagger.openapi_spec') }}" data-testid="codex-openapi">Download OpenAPI spec</a></p>
+  {% else %}
+    <p><a href="{{ url_for('api_swagger.docs') }}" data-testid="codex-open">Open API reference</a></p>
+  {% endif %}
+</section>
+{% endblock %}

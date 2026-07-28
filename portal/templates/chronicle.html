@@ -1,0 +1,47 @@
+{% extends "shell.html" %}
+{% block title %}Chronicle — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="chronicle-panel">
+  <header class="panel-head">
+    <h1>Chronicle</h1>
+    <p class="panel-sub">Full-text search across the ledger</p>
+  </header>
+  <form id="chronicle-form" class="filters" data-testid="chronicle-form">
+    <label class="field grow">
+      <span>Query</span>
+      <input name="q" type="search" placeholder="fts5 expression" data-testid="chronicle-q" />
+    </label>
+    <label class="field">
+      <span>From</span>
+      <input name="since" type="datetime-local" data-testid="chronicle-since" />
+    </label>
+    <label class="field">
+      <span>To</span>
+      <input name="until" type="datetime-local" data-testid="chronicle-until" />
+    </label>
+    <label class="field">
+      <span>Source IP</span>
+      <input name="source_ip" type="text" data-testid="chronicle-source" />
+    </label>
+    <button type="submit" class="btn-primary" data-testid="chronicle-search">Search</button>
+  </form>
+  <div class="live-table">
+    <table class="grid">
+      <thead>
+        <tr>
+          <th>Time</th><th>Source</th><th>Host</th><th>Severity</th><th>Message</th>
+        </tr>
+      </thead>
+      <tbody id="chronicle-body" data-testid="chronicle-body"></tbody>
+    </table>
+  </div>
+  <nav class="pagination" data-testid="chronicle-pagination">
+    <button type="button" data-page-action="prev" data-testid="chronicle-prev">Prev</button>
+    <span id="chronicle-page-info" data-testid="chronicle-page-info"></span>
+    <button type="button" data-page-action="next" data-testid="chronicle-next">Next</button>
+  </nav>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.chronicle && window.Watchtower.chronicle.mount();</script>
+{% endblock %}

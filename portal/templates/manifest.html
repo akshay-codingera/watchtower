@@ -1,0 +1,30 @@
+{% extends "shell.html" %}
+{% block title %}Manifest — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="manifest-panel">
+  <header class="panel-head">
+    <h1>Manifest</h1>
+    <p class="panel-sub">Schedule an export of the ledger</p>
+  </header>
+  <form id="manifest-form" class="form filters" data-testid="manifest-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <label class="field">
+      <span>Format</span>
+      <select name="format" data-testid="manifest-format">
+        <option value="csv">CSV</option>
+        <option value="json">JSON</option>
+        <option value="ndjson">NDJSON</option>
+      </select>
+    </label>
+    <label class="field"><span>From</span><input name="since" type="datetime-local" data-testid="manifest-since" /></label>
+    <label class="field"><span>To</span><input name="until" type="datetime-local" data-testid="manifest-until" /></label>
+    <label class="field"><span>Severity</span><input name="severity" placeholder="warning,error" data-testid="manifest-severity" /></label>
+    <label class="field"><span>Source IP</span><input name="source_ip" data-testid="manifest-source-ip" /></label>
+    <button type="submit" class="btn-primary" data-testid="manifest-submit">Create export</button>
+  </form>
+  <section class="alert" id="manifest-status" role="status" data-testid="manifest-status" hidden></section>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.manifest && window.Watchtower.manifest.mount();</script>
+{% endblock %}

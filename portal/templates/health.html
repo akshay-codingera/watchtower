@@ -1,0 +1,14 @@
+{% extends "shell.html" %}
+{% block title %}Health — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="health-panel">
+  <header class="panel-head">
+    <h1>System Health</h1>
+    <span class="badge" id="health-badge" data-testid="health-badge">…</span>
+  </header>
+  <dl class="stat-grid" id="health-stats" data-testid="health-stats"></dl>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.health && window.Watchtower.health.mount();</script>
+{% endblock %}

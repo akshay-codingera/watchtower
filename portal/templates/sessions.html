@@ -1,0 +1,27 @@
+{% extends "shell.html" %}
+{% block title %}Sessions — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="sessions-panel">
+  <header class="panel-head">
+    <h1>Sessions</h1>
+    <p class="panel-sub">Recent successful sign-ins</p>
+  </header>
+  <table class="grid">
+    <thead>
+      <tr><th>Time</th><th>Actor</th><th>IP</th><th>User agent</th></tr>
+    </thead>
+    <tbody data-testid="sessions-body">
+      {% for row in history %}
+        <tr>
+          <td>{{ row.timestamp }}</td>
+          <td>{{ row.actor }}</td>
+          <td>{{ row.metadata.ip if row.metadata else '' }}</td>
+          <td>{{ row.metadata.user_agent if row.metadata else '' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="muted">No sign-ins recorded.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "shell.html" %}
+{% block title %}Watchdog — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="watchdog-panel">
+  <header class="panel-head">
+    <h1>Watchdog</h1>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="open" class="tab active" data-testid="watchdog-tab-open">Open</button>
+      <button type="button" role="tab" data-tab="ack" class="tab" data-testid="watchdog-tab-ack">Acknowledged</button>
+      <button type="button" role="tab" data-tab="resolved" class="tab" data-testid="watchdog-tab-resolved">Resolved</button>
+    </div>
+  </header>
+  <table class="grid">
+    <thead>
+      <tr>
+        <th>Opened</th><th>Severity</th><th>Rule</th><th>Source</th><th>State</th><th></th>
+      </tr>
+    </thead>
+    <tbody id="watchdog-body" data-testid="watchdog-body"></tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.watchdog && window.Watchtower.watchdog.mount();</script>
+{% endblock %}

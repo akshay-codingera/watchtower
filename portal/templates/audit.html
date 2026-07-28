@@ -1,0 +1,25 @@
+{% extends "shell.html" %}
+{% block title %}Audit — Watchtower{% endblock %}
+{% block content %}
+<section class="panel" data-testid="audit-panel">
+  <header class="panel-head">
+    <h1>Audit Trail</h1>
+  </header>
+  <div class="filters">
+    <label class="field"><span>Actor</span><input id="audit-actor" data-testid="audit-actor" /></label>
+    <label class="field"><span>Action</span><input id="audit-action" data-testid="audit-action" /></label>
+    <label class="field"><span>From</span><input id="audit-since" type="datetime-local" data-testid="audit-since" /></label>
+    <label class="field"><span>To</span><input id="audit-until" type="datetime-local" data-testid="audit-until" /></label>
+    <button type="button" id="audit-search" class="btn-primary" data-testid="audit-search">Search</button>
+  </div>
+  <table class="grid">
+    <thead>
+      <tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>Metadata</th></tr>
+    </thead>
+    <tbody id="audit-body" data-testid="audit-body"></tbody>
+  </table>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>window.Watchtower.audit && window.Watchtower.audit.mount();</script>
+{% endblock %}
