@@ -28,7 +28,7 @@ from typing import Any, Final, Iterator
 from flask import Blueprint, Response, current_app, g, request, stream_with_context
 
 from dispatch.notifier import browser as _browser  # type: ignore[import-not-found]
-from nucleus.telemetry import telemetry  # type: ignore[import-not-found]
+from nucleus.telemetry import metrics as telemetry  # type: ignore[import-not-found]
 
 from portal.middleware import login_required
 

@@ -12,7 +12,8 @@ from typing import Any, Final, Optional
 
 from flask import Flask
 
-from nucleus.config import config as _config  # type: ignore[import-not-found]
+from nucleus.config import cfg as _cfg
+_config = _cfg.parser  # type: ignore[import-not-found]
 
 from portal.errors import register_error_handlers
 from portal.middleware import register_middleware
@@ -46,10 +47,10 @@ def _cfg_getbool(section: str, option: str, default: bool) -> bool:
 
 def _apply_configuration(app: Flask) -> None:
     """Copy relevant options from ``nucleus.config`` onto the Flask app."""
-    secret = _cfg_get(_PORTAL_SECTION, "secret_key")
+    secret = _cfg_get(_PORTAL_SECTION, "secret_key") or _cfg.auth.secret_key
     if not secret:
         raise RuntimeError(
-            "portal.secret_key is not configured in Watchtower config.ini"
+            "No secret key configured: set [auth] secret_key in config.ini"
         )
     app.config["SECRET_KEY"] = secret
     app.config["PORTAL_HTTPS"] = _cfg_getbool(_PORTAL_SECTION, "https", False)

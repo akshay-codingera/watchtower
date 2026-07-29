@@ -9,7 +9,7 @@ from flask import Flask, Response, jsonify, render_template, request
 from werkzeug.exceptions import HTTPException
 
 from nucleus.exceptions import (  # type: ignore[import-not-found]
-    AuthFailure,
+    AuthError,
     ParseError,
     RateLimitExceeded,
 )
@@ -66,8 +66,8 @@ def register_error_handlers(app: Flask) -> None:
     def _too_many_requests(exc: HTTPException) -> Any:
         return _render_error(429, "rate_limited", exc.description or "Too many requests")
 
-    @app.errorhandler(AuthFailure)
-    def _auth_failure(exc: AuthFailure) -> Any:
+    @app.errorhandler(AuthError)
+    def _auth_failure(exc: AuthError) -> Any:
         _LOG.info("Authentication failed: %s", exc)
         return _render_error(401, "auth_failure", "Authentication failed")
 

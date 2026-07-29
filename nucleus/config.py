@@ -77,6 +77,12 @@ class WatchtowerConfig:
         self.scheduler    = _SchedulerConfig(self._parser)
         self.notifications = _NotificationConfig(self._parser)
         self.beacon       = _BeaconConfig(self._parser)
+        self.portal       = _PortalConfig(self._parser)
+
+    @property
+    def parser(self) -> configparser.ConfigParser:
+        """Raw configparser, for modules that need arbitrary section/option access."""
+        return self._parser
 
     def _validate(self) -> None:
         """Check that all required sections and keys exist."""
@@ -322,6 +328,23 @@ class _BeaconConfig(_BaseConfig):
     def snmp_community(self) -> str:     return self._str("snmp_community", "public")
     @property
     def subnet(self) -> str:             return self._str("subnet", "")
+
+
+class _PortalConfig(_BaseConfig):
+    def __init__(self, p): super().__init__(p, "portal")
+
+    @property
+    def host(self) -> str:                return self._str("host", "0.0.0.0")
+    @property
+    def port(self) -> int:                return self._int("port", 5000)
+    @property
+    def https(self) -> bool:              return self._bool("https", False)
+    @property
+    def max_content_length(self) -> int:  return self._int("max_content_length", 4 * 1024 * 1024)
+    @property
+    def session_cookie_name(self) -> str: return self._str("session_cookie_name", "watchtower_session")
+    @property
+    def content_security_policy(self) -> str: return self._str("content_security_policy", "")
 
 
 # ── Module-level singleton ────────────────────────────────────────────────────

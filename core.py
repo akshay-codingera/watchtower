@@ -159,6 +159,7 @@ class WatchtowerApp:
 
         self.metrics_logger = IntakeMetricsLogger()
         self.ingest_workers: list[IngestWorker] = []
+        self.portal_thread: threading.Thread | None = None
 
         self._stop_event = threading.Event()
 
@@ -187,21 +188,36 @@ class WatchtowerApp:
 
         self.metrics_logger.start()
 
-        # ⚠ Not built yet — wire these in once their packages exist:
+        # ⚠ scheduler/ (retention, backups, digests) is still not wired in.
         #   from scheduler.clock import Clock
         #   self.clock = Clock(); self.clock.start()
-        #   from portal.gate import create_app
-        #   self.portal_thread = threading.Thread(target=lambda: create_app().run(...))
-        logger.warning(
-            "scheduler/ and portal/ are not built yet — running intake+ledger only. "
-            "Retention, backups, and the dashboard are unavailable this run."
+        from portal.gate import create_app
+        portal_app = create_app()
+
+        def _run_portal() -> None:
+            portal_app.run(
+                host=cfg.portal.host,
+                port=cfg.portal.port,
+                debug=False,
+                use_reloader=False,
+                threaded=True,
+            )
+
+        self.portal_thread = threading.Thread(
+            target=_run_portal, name="portal", daemon=True
         )
+        self.portal_thread.start()
 
         logger.info(
             "WATCHTOWER is up — UDP %s:%d, TCP %s:%d%s",
             cfg.intake.udp_host, cfg.intake.udp_port,
             cfg.intake.udp_host, cfg.intake.tcp_port,
             f", TLS {cfg.intake.udp_host}:{cfg.intake.tls_port}" if self.tls_listener else "",
+        )
+        logger.info(
+            "Dashboard: http://%s:%d/  (login with the [auth] admin_password_hash from config.ini)",
+            "localhost" if cfg.portal.host in ("0.0.0.0", "") else cfg.portal.host,
+            cfg.portal.port,
         )
 
     # ── Shutdown ─────────────────────────────────────────────────────────
