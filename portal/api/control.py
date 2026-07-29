@@ -9,8 +9,9 @@ from flask import Blueprint, request
 
 from dispatch import incident as _incident  # type: ignore[import-not-found]
 from dispatch import rulebook as _rulebook  # type: ignore[import-not-found]
-from nucleus.config import config as _config  # type: ignore[import-not-found]
-from nucleus.telemetry import telemetry  # type: ignore[import-not-found]
+from nucleus.config import cfg as _cfg
+_config = _cfg.parser  # type: ignore[import-not-found]
+from nucleus.telemetry import metrics as telemetry  # type: ignore[import-not-found]
 
 from portal.middleware import login_required, role_required
 from portal.responses import fail, ok

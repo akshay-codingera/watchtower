@@ -20,10 +20,8 @@ from typing import Any, Callable, Deque, Final, Optional
 
 from flask import Flask, abort, current_app, g, request, session
 
-from nucleus.exceptions import AuthFailure  # type: ignore[import-not-found]
-from sentinel_gate import apikey as _apikey  # type: ignore[import-not-found]
-from sentinel_gate import rbac as _rbac  # type: ignore[import-not-found]
-from sentinel_gate import session as _session  # type: ignore[import-not-found]
+from nucleus.exceptions import AuthError, APIKeyInvalid  # type: ignore[import-not-found]
+from portal import runtime as _rt
 
 _LOG: Final = logging.getLogger("watchtower.portal.access")
 
@@ -69,23 +67,21 @@ def _resolve_identity() -> None:
             api_key = auth_hdr[7:].strip()
     if api_key:
         try:
-            principal = _apikey.validate_api_key(api_key)
-        except AuthFailure:
-            principal = None
-        if principal:
-            g.principal = principal
+            record = _rt.apikeys.validate_key(api_key)
+            g.principal = _rt.Principal(username=record["name"], role=record["role"])
             g.auth_kind = "api_key"
             return
+        except APIKeyInvalid:
+            pass
 
     sid = session.get(_SESSION_COOKIE_KEY)
     if sid:
         try:
-            principal = _session.get_session(sid)
-        except AuthFailure:
-            principal = None
-        if principal:
-            g.principal = principal
+            record = _rt.sessions.validate_session(sid, ip_address=request.remote_addr or "")
+            g.principal = _rt.Principal(username=record["username"], role=record["role"])
             g.auth_kind = "session"
+        except AuthError:
+            session.pop(_SESSION_COOKIE_KEY, None)
 
 
 # ---------------------------------------------------------------------------
@@ -112,7 +108,7 @@ def role_required(*roles: str) -> Callable[[Callable[..., Any]], Callable[..., A
             principal = getattr(g, "principal", None)
             if principal is None:
                 abort(401)
-            if not _rbac.has_any_role(principal, list(roles)):
+            if principal.role not in roles:
                 abort(403)
             return view(*args, **kwargs)
 

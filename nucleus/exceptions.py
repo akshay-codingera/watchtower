@@ -160,6 +160,12 @@ class SNMPError(BeaconError):
 class ARPScanError(BeaconError):
     """ARP table scan failed."""
 
+class DHCPConfigError(BeaconError):
+    """Standalone DHCP config is invalid (bad range, bad IP, etc.)."""
+
+class DHCPServerError(BeaconError):
+    """Standalone DHCP server (dnsmasq) failed to start, stop, or run."""
+
 
 # ── Sentinel gate / authentication exceptions ─────────────────────────────────
 

@@ -77,6 +77,12 @@ class WatchtowerConfig:
         self.scheduler    = _SchedulerConfig(self._parser)
         self.notifications = _NotificationConfig(self._parser)
         self.beacon       = _BeaconConfig(self._parser)
+        self.portal       = _PortalConfig(self._parser)
+
+    @property
+    def parser(self) -> configparser.ConfigParser:
+        """Raw configparser, for modules that need arbitrary section/option access."""
+        return self._parser
 
     def _validate(self) -> None:
         """Check that all required sections and keys exist."""
@@ -322,6 +328,46 @@ class _BeaconConfig(_BaseConfig):
     def snmp_community(self) -> str:     return self._str("snmp_community", "public")
     @property
     def subnet(self) -> str:             return self._str("subnet", "")
+
+    # ── Standalone DHCP (lab/test networks only — see beacon/dhcpd.py) ────
+    @property
+    def dhcp_mode(self) -> str:
+        """'disabled' (default) or 'standalone'. Never enable standalone
+        on a network segment that already has a DHCP server."""
+        return self._str("dhcp_mode", "disabled")
+    @property
+    def dhcp_interface(self) -> str:     return self._str("dhcp_interface", "")
+    @property
+    def dhcp_range_start(self) -> str:   return self._str("dhcp_range_start", "")
+    @property
+    def dhcp_range_end(self) -> str:     return self._str("dhcp_range_end", "")
+    @property
+    def dhcp_lease_time(self) -> str:    return self._str("dhcp_lease_time", "12h")
+    @property
+    def dhcp_option7(self) -> str:
+        """The IP address devices will be told to send syslog to."""
+        return self._str("dhcp_option7", "")
+    @property
+    def dhcp_gateway(self) -> str:       return self._str("dhcp_gateway", "")
+    @property
+    def dhcp_dns_servers(self) -> list[str]: return self._list("dhcp_dns_servers")
+
+
+class _PortalConfig(_BaseConfig):
+    def __init__(self, p): super().__init__(p, "portal")
+
+    @property
+    def host(self) -> str:                return self._str("host", "0.0.0.0")
+    @property
+    def port(self) -> int:                return self._int("port", 5000)
+    @property
+    def https(self) -> bool:              return self._bool("https", False)
+    @property
+    def max_content_length(self) -> int:  return self._int("max_content_length", 4 * 1024 * 1024)
+    @property
+    def session_cookie_name(self) -> str: return self._str("session_cookie_name", "watchtower_session")
+    @property
+    def content_security_policy(self) -> str: return self._str("content_security_policy", "")
 
 
 # ── Module-level singleton ────────────────────────────────────────────────────

@@ -14,10 +14,10 @@ from flask import Blueprint, request
 
 from intake import conduit as _conduit  # type: ignore[import-not-found]
 from nucleus.exceptions import (  # type: ignore[import-not-found]
-    AuthFailure,
+    APIKeyInvalid,
     RateLimitExceeded,
 )
-from sentinel_gate import apikey as _apikey  # type: ignore[import-not-found]
+from portal import runtime as _rt
 
 from portal.middleware import rate_limit
 from portal.responses import fail, ok
@@ -60,10 +60,8 @@ def ingest() -> Any:
     if not key:
         return fail("unauthorized", "API key required", status=401)
     try:
-        principal = _apikey.validate_api_key(key)
-    except AuthFailure:
-        principal = None
-    if principal is None:
+        _rt.apikeys.validate_key(key)
+    except APIKeyInvalid:
         return fail("unauthorized", "Invalid API key", status=401)
 
     source = request.remote_addr or "http"

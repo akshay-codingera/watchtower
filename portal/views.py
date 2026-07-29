@@ -22,14 +22,14 @@ from flask import (
     url_for,
 )
 
-from chronicle import auditor as _auditor  # type: ignore[import-not-found]
-from chronicle import trail as _trail  # type: ignore[import-not-found]
-from nucleus.exceptions import AuthFailure  # type: ignore[import-not-found]
+from nucleus.config import cfg as _cfg
 from sentinel_gate import auth as _auth  # type: ignore[import-not-found]
-from sentinel_gate import lockout as _lockout  # type: ignore[import-not-found]
-from sentinel_gate import session as _session  # type: ignore[import-not-found]
+from nucleus.exceptions import SessionExpired, SessionInvalid  # type: ignore[import-not-found]
 
+from portal import runtime as _rt
 from portal.middleware import login_required, role_required
+
+_ADMIN_USERNAME: Final[str] = "admin"
 
 _LOG: Final = logging.getLogger(__name__)
 
@@ -67,31 +67,35 @@ def gate_submit() -> object:
             "gate.html", page_id="gate", error="Username and password are required."
         ), 400
 
-    if _lockout.is_locked(username, remote_ip):
+    if _rt.lockout.is_locked(remote_ip):
         _LOG.warning("login blocked (locked out) user=%s ip=%s", username, remote_ip)
         return render_template(
             "gate.html", page_id="gate", error="Account temporarily locked."
         ), 429
 
-    try:
-        principal = _auth.verify_password(username, password)
-    except AuthFailure:
-        principal = None
+    # WATCHTOWER has a single admin account (see sentinel_gate/auth.py).
+    ok = (
+        username == _ADMIN_USERNAME
+        and _auth.verify_password(password, _cfg.auth.admin_password_hash)
+    )
 
-    if principal is None:
-        _lockout.record_failure(username, remote_ip)
-        _auditor.audit(actor=username, action="login_failed", target="portal",
-                       metadata={"ip": remote_ip})
+    if not ok:
+        _rt.lockout.record_failure(remote_ip)
+        _rt.auditor.login_failed(actor=username, ip_address=remote_ip,
+                                  user_agent=request.headers.get("User-Agent", ""),
+                                  reason="invalid credentials")
         return render_template(
             "gate.html", page_id="gate", error="Invalid credentials."
         ), 401
 
-    _lockout.record_success(username, remote_ip)
-    sid = _session.create_session(principal, remote_ip=remote_ip,
-                                  user_agent=request.headers.get("User-Agent", ""))
+    _rt.lockout.record_success(remote_ip)
+    user_agent = request.headers.get("User-Agent", "")
+    sid = _rt.sessions.create_session(
+        username=username, role="admin", ip_address=remote_ip, user_agent=user_agent
+    )
     session[_SESSION_COOKIE_KEY] = sid
-    _auditor.audit(actor=username, action="login_success", target="portal",
-                   metadata={"ip": remote_ip})
+    _rt.auditor.login_success(actor=username, ip_address=remote_ip,
+                               user_agent=user_agent, session_id=sid[:16])
     return redirect(url_for("views.observatory"))
 
 
@@ -101,12 +105,11 @@ def logout() -> object:
     """Terminate the current session."""
     sid = session.pop(_SESSION_COOKIE_KEY, None)
     if sid:
-        _session.destroy_session(sid)
-    _auditor.audit(
+        _rt.sessions.invalidate_session(sid)
+    _rt.auditor.logout(
         actor=getattr(g.principal, "username", "unknown"),
-        action="logout",
-        target="portal",
-        metadata={"ip": request.remote_addr or "unknown"},
+        session_id=(sid or "")[:16],
+        ip_address=request.remote_addr or "unknown",
     )
     return redirect(url_for("views.gate"))
 
@@ -167,7 +170,8 @@ def audit() -> str:
 @login_required
 @role_required("admin")
 def sessions_page() -> str:
-    history = _trail.query_audit(action="login_success", limit=200)
+    from chronicle.trail import TrailFilter
+    history = _rt.trail.query(TrailFilter(action="login_success", limit=200))
     return render_template("sessions.html", page_id="sessions", history=history)
 
 

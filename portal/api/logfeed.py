@@ -14,7 +14,7 @@ from flask import Blueprint, request
 
 from ledger import archivist as _archivist  # type: ignore[import-not-found]
 from ledger import indexer as _indexer  # type: ignore[import-not-found]
-from nucleus.telemetry import telemetry  # type: ignore[import-not-found]
+from nucleus.telemetry import metrics as telemetry  # type: ignore[import-not-found]
 
 from portal.middleware import login_required, rate_limit
 from portal.responses import fail, ok

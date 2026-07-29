@@ -80,3 +80,15 @@ arp_scan_enabled    = false
 snmp_enabled        = false
 snmp_community      = public
 subnet              =
+
+# Standalone DHCP (lab/test only) -- see beacon/dhcpd.py before touching this.
+# Leave dhcp_mode = disabled unless you have confirmed this interface has
+# NO other DHCP server on it.
+dhcp_mode           = disabled
+dhcp_interface      =
+dhcp_range_start    =
+dhcp_range_end      =
+dhcp_lease_time     = 12h
+dhcp_option7        =
+dhcp_gateway        =
+dhcp_dns_servers    =
