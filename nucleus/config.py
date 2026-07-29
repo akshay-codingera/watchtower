@@ -370,6 +370,23 @@ class _PortalConfig(_BaseConfig):
     def content_security_policy(self) -> str: return self._str("content_security_policy", "")
 
 
+class _PortalConfig(_BaseConfig):
+    def __init__(self, p): super().__init__(p, "portal")
+
+    @property
+    def host(self) -> str:                return self._str("host", "0.0.0.0")
+    @property
+    def port(self) -> int:                return self._int("port", 5000)
+    @property
+    def https(self) -> bool:              return self._bool("https", False)
+    @property
+    def max_content_length(self) -> int:  return self._int("max_content_length", 4 * 1024 * 1024)
+    @property
+    def session_cookie_name(self) -> str: return self._str("session_cookie_name", "watchtower_session")
+    @property
+    def content_security_policy(self) -> str: return self._str("content_security_policy", "")
+
+
 # ── Module-level singleton ────────────────────────────────────────────────────
 # Import this object everywhere. It is loaded once at first import.
 # If config.ini is missing or invalid, this raises ConfigError at startup.
