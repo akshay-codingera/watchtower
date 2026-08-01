@@ -4,4 +4,5 @@ Watchtower is a modular, enterprise-grade Syslog Server built in Python for coll
 
 
 # This enterprise siem platform is named ### specula
+SIEM :  SECURITY INFORMATION EVENT MANAGEMENT
 
